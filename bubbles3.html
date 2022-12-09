@@ -1,0 +1,149 @@
+<html>
+
+<head>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="canvas" width="900" height="600"></canvas>
+
+  <br>
+  <input type="text" id="bubble-text" placeholder="Enter text for bubble">
+  <button type="button" id="add-bubble">Add Bubble</button>
+
+  <script>
+    // Get the canvas element and its drawing context
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+
+    // Create an array to store the bubbles
+    var bubbles = [];
+
+    // Add a new bubble when the "Add Bubble" button is clicked
+    document.getElementById('add-bubble').addEventListener('click', function() {
+      // Get the text for the bubble from the input field
+      var bubbleText = document.getElementById('bubble-text').value;
+
+      // Create a new bubble object with the specified text
+      var bubble = {
+        text: bubbleText,
+        x: 50, // x-coordinate for the bubble (arbitrary starting value)
+        y: 50, // y-coordinate for the bubble (arbitrary starting value)
+        radius: 30 // radius of the bubble (arbitrary value)
+      };
+
+      // Add the new bubble to the array of bubbles
+      bubbles.push(bubble);
+
+      // Clear the input field
+      document.getElementById('bubble-text').value = '';
+
+      // Draw the bubbles and lines on the canvas
+      draw();
+    });
+
+    // Set a flag to indicate when a bubble is being dragged
+    var isDragging = false;
+    var currentBubble = null;
+
+    // Handle the mousedown event on the canvas
+    canvas.addEventListener('mousedown', function(e) {
+      // Get the mouse position
+      var mouseX = e.offsetX;
+      var mouseY = e.offsetY;
+
+      // Loop through the array of bubbles and check if the cursor is inside any of them
+      for (var i = 0; i < bubbles.length; i++) {
+        var bubble = bubbles[i];
+
+        // Calculate the distance between the cursor and the center of the bubble
+        var dx = mouseX - bubble.x;
+        var dy = mouseY - bubble.y;
+        var distance = Math.sqrt(dx * dx + dy * dy);
+
+        // Check if the cursor is inside the bubble
+	if (distance < bubble.radius) {
+		// Set the flag to indicate that the bubble is being dragged
+		isDragging = true;
+		currentBubble = bubble;
+		break;
+		}
+	}
+	});
+// Handle the mousemove event on the canvas
+canvas.addEventListener('mousemove', function(e) {
+  // Check if a bubble is being dragged
+  if (isDragging) {
+    // Update the position of the bubble to follow the mouse cursor
+    var mouseX = e.offsetX;
+    var mouseY = e.offsetY;
+    currentBubble.x = mouseX;
+    currentBubble.y = mouseY;
+
+    // Draw the bubbles and lines on the canvas
+    draw();
+  }
+});
+
+// Handle the mouseup event on the canvas
+canvas.addEventListener('mouseup', function(e) {
+  // Clear the flag to indicate that the bubble is no longer being dragged
+  isDragging = false;
+  currentBubble = null;
+});
+
+// Draw the bubbles and lines on the canvas
+function draw() {
+  // Clear the canvas
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Loop through the array of bubbles and draw each one
+  for (var i = 0; i < bubbles.length; i++) {
+    var bubble = bubbles[i];
+
+    // Draw the bubble
+    ctx.beginPath();
+    ctx.arc(bubble.x, bubble.y, bubble.radius, 0, 2 * Math.PI);
+    ctx.fillStyle = 'lightblue';
+    ctx.fill();
+    ctx.strokeStyle = 'black';
+    ctx.stroke();
+
+    // Draw the text inside the bubble
+    ctx.font = '16px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'black';
+    ctx.fillText(bubble.text, bubble.x, bubble.y);
+  }
+
+  // Loop through the array of bubbles again and draw lines between them
+  for (var i = 0; i < bubbles.length; i++) {
+    var bubble1 = bubbles[i];
+
+    for (var j = 0; j < bubbles.length; j++) {
+      var bubble2 = bubbles[j];
+
+      // Draw a line between the two bubbles
+      ctx.beginPath();
+      ctx.moveTo(bubble1.x, bubble1.y);
+      ctx.lineTo(bubble2.x, bubble2.y);
+      ctx.strokeStyle = 'black';
+      ctx.stroke();
+    }
+  }
+
+  // Request another animation frame to continue drawing the bubbles and lines
+  requestAnimationFrame(draw);
+}
+
+// Start drawing the bubbles and lines
+draw();
+  </script>
+</body>
+</html>
+
+
